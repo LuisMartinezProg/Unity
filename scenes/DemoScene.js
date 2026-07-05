@@ -4,6 +4,7 @@ import { Transform } from '../components/Transform.js';
 import { MeshRenderer } from '../components/MeshRenderer.js';
 import { RigidBody } from '../components/RigidBody.js';
 import { PlayerControlled } from '../components/PlayerControlled.js';
+import { GroundChecker } from '../components/GroundChecker.js';
 import { Light } from '../components/Light.js';
 import { Shapes } from '../physics/PhysicsShapes.js';
 
@@ -11,7 +12,9 @@ import { Shapes } from '../physics/PhysicsShapes.js';
  * Escena de ejemplo que prueba el pipeline completo de punta a punta:
  * - Piso estático (mass: 0)
  * - Cubo que cae solo por gravedad (demuestra física pura)
- * - Esfera controlable con WASD/flechas/joystick táctil (demuestra input)
+ * - Esfera controlable con WASD/flechas/joystick táctil, con salto
+ *   (demuestra input + detección de suelo)
+ * - Una plataforma baja para tener algo que saltar
  * - Una luz direccional con sombras
  *
  * Usá esto como plantilla: copiá el patrón create-entity + add-componentes
@@ -44,6 +47,21 @@ export function createDemoScene() {
   cube.add(new MeshRenderer(cubeMesh));
   cube.add(new RigidBody({ mass: 1, shape: Shapes.box(1, 1, 1), position: [-2, 5, 0] }));
 
+  // --- Plataforma baja para probar el salto (más alta que el radio del
+  // jugador, así no la puede simplemente "empujar" y necesita saltar) ---
+  const platform = scene.createEntity('Platform');
+  const platformMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(3, 0.8, 3),
+    new THREE.MeshStandardMaterial({ color: 0x6a5a8a })
+  );
+  platformMesh.castShadow = true;
+  platformMesh.receiveShadow = true;
+  platform.add(new Transform({ position: [5.5, 0.4, 0] }));
+  platform.add(new MeshRenderer(platformMesh));
+  platform.add(
+    new RigidBody({ mass: 0, shape: Shapes.box(3, 0.8, 3), position: [5.5, 0.4, 0] })
+  );
+
   // --- Jugador (input -> velocidad -> física) ---
   const player = scene.createEntity('Player');
   const playerMesh = new THREE.Mesh(
@@ -62,7 +80,8 @@ export function createDemoScene() {
       fixedRotation: true, // evita que la esfera "ruede" por el torque de contacto
     })
   );
-  player.add(new PlayerControlled({ speed: 5 }));
+  player.add(new PlayerControlled({ speed: 5, jumpForce: 6 }));
+  player.add(new GroundChecker({ rayLength: 0.6 }));
 
   // --- Luz direccional con sombras ---
   const lightEntity = scene.createEntity('SunLight');
