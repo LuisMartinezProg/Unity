@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Motor 3D — Demo</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0e0e14;
+    height: 100%;
+    width: 100%;
+  }
+  canvas {
+    display: block;
+    touch-action: none;
+  }
+</style>
+
+<!--
+  Import map: le dice al navegador dónde buscar "three" y "cannon-es" cuando
+  ve esos nombres en un import, sin necesidad de bundler ni build step.
+  Versiones fijadas a propósito (no "@latest") para que el proyecto no se
+  rompa solo si alguna de las dos librerías saca una versión nueva.
+-->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+    "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="viewport"></canvas>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
