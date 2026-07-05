@@ -1,3 +1,4 @@
+
 /**
  * Junta el input crudo (teclado, mouse, joystick táctil) en un solo lugar
  * con estado consultable. No decide qué hacer con ese input: eso lo hacen
@@ -8,10 +9,11 @@
  * en que ocurren (evento de teclado/touch), no en el loop del engine.
  */
 export class InputSystem {
-  constructor({ enableTouchJoystick = true } = {}) {
+  constructor({ enableTouchJoystick = true, enableTouchJumpButton = true } = {}) {
     this.keys = new Set();
     this.pointerDelta = { x: 0, y: 0 };
     this.joystick = { x: 0, y: 0, active: false };
+    this.jumpButton = { active: false };
 
     window.addEventListener('keydown', (e) => this.keys.add(e.code));
     window.addEventListener('keyup', (e) => this.keys.delete(e.code));
@@ -22,6 +24,7 @@ export class InputSystem {
     });
 
     if (enableTouchJoystick) this._setupTouchJoystick();
+    if (enableTouchJumpButton) this._setupTouchJumpButton();
   }
 
   isKeyDown(code) {
@@ -112,5 +115,38 @@ export class InputSystem {
     window.addEventListener('touchmove', onMove, { passive: true });
     window.addEventListener('touchend', onEnd, { passive: true });
     window.addEventListener('touchcancel', onEnd, { passive: true });
+  }
+
+  _setupTouchJumpButton() {
+    const button = document.createElement('div');
+    button.textContent = '⤒';
+    Object.assign(button.style, {
+      position: 'fixed',
+      right: '30px',
+      bottom: '30px',
+      width: '70px',
+      height: '70px',
+      borderRadius: '50%',
+      background: 'rgba(255,255,255,0.15)',
+      border: '2px solid rgba(255,255,255,0.3)',
+      color: 'rgba(255,255,255,0.7)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '28px',
+      touchAction: 'none',
+      userSelect: 'none',
+      zIndex: '1000',
+    });
+    document.body.appendChild(button);
+
+    const setActive = (active) => {
+      this.jumpButton.active = active;
+      button.style.background = active ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.15)';
+    };
+
+    button.addEventListener('touchstart', (e) => { e.preventDefault(); setActive(true); }, { passive: false });
+    button.addEventListener('touchend', () => setActive(false), { passive: true });
+    button.addEventListener('touchcancel', () => setActive(false), { passive: true });
   }
 }
