@@ -1,0 +1,10 @@
+/**
+ * Marca una entidad como controlable por el jugador y guarda su velocidad
+ * de movimiento. El PlayerControlSystem busca entidades con este componente
+ * (+ Transform + RigidBody) y les aplica velocidad según el input.
+ */
+export class PlayerControlled {
+  constructor({ speed = 5 } = {}) {
+    this.speed = speed;
+  }
+}
